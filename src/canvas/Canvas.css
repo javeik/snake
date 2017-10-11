@@ -1,0 +1,23 @@
+.drawingCanvas {
+  text-align: center;
+}
+
+.drawingCanvas-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.drawingCanvas-intro {
+  font-size: large;
+}
+
+.drawingCanvas-canvas {
+  background-color: green;
+  border-style: solid;
+  border-width: medium;
+  border-radius: 5px;
+  position: fixed;
+  left: 32%;
+}
