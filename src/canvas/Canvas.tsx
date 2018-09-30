@@ -4,25 +4,27 @@ import './Canvas.css';
 
 import * as React from 'react';
 
-import { DebugPanel } from '../DebugPanel/DebugPanel';
-import { Snake } from '../Entity/Snake/Snake';
-import { Header } from '../Header/Header';
+import DebugPanel from '../DebugPanel/DebugPanel';
+import GameBoard from '../Entity/GameBoard/GameBoard';
+import Snake from '../Entity/Snake/Snake';
+import Header from '../Header/Header';
 
 export class Canvas extends React.Component<{}, ICanvasState> {
   private drawingCanvas: HTMLCanvasElement | null;
   private drawingCtx: CanvasRenderingContext2D | null;
-  private canvasWidth: number;
-  private canvasHeight: number;
   private baseSpeed: number;
+  private gameBoard: GameBoard;
   private snake: Snake;
 
   constructor() {
     super();
-    this.baseSpeed = 1;
-    this.canvasWidth = this.canvasHeight = 700;
-    this.snake = new Snake(350, 370, 1, 1);
 
-    this.state = { targetX: 0, targetY: 0, distanceToTarget: 0 };
+    this.baseSpeed = 1;
+
+    this.gameBoard = new GameBoard();
+    this.snake = new Snake();
+
+    this.state = { distanceToTarget: 0 };
   }
 
   public render() {
@@ -35,8 +37,8 @@ export class Canvas extends React.Component<{}, ICanvasState> {
               this.drawingCanvas = canvas;
             }}
             className="drawingCanvas-canvas"
-            width={this.canvasWidth}
-            height={this.canvasHeight}
+            width={this.gameBoard.boardWidth}
+            height={this.gameBoard.boardHeight}
             onClick={event => this.handleClicking(event)}
           />
         </div>
@@ -44,12 +46,12 @@ export class Canvas extends React.Component<{}, ICanvasState> {
           <DebugPanel
             x={this.snake.x}
             y={this.snake.y}
-            rectLength={this.canvasHeight}
-            rectWidth={this.canvasWidth}
+            rectLength={this.gameBoard.boardHeight}
+            rectWidth={this.gameBoard.boardWidth}
             speedX={this.snake.getSpeed().xSpeed}
             speedY={this.snake.getSpeed().ySpeed}
-            clickX={this.state.targetX}
-            clickY={this.state.targetY}
+            clickX={this.gameBoard.targetX}
+            clickY={this.gameBoard.targetY}
             distanceToClick={this.state.distanceToTarget}
           />
         </div>
@@ -74,10 +76,11 @@ export class Canvas extends React.Component<{}, ICanvasState> {
   }
 
   private handleClicking(event: React.MouseEvent<HTMLCanvasElement>) {
-    this.setState({
-      targetX: event.clientX - this.drawingCanvas!.getBoundingClientRect().left,
-      targetY: event.clientY - this.drawingCanvas!.getBoundingClientRect().top
-    });
+    this.gameBoard.setTarget(
+      event.clientX - this.drawingCanvas!.getBoundingClientRect().left,
+      event.clientY - this.drawingCanvas!.getBoundingClientRect().top
+    );
+
     this.calculateTrajectory();
   }
 
@@ -87,19 +90,29 @@ export class Canvas extends React.Component<{}, ICanvasState> {
   }
 
   private clearScreen() {
-    this.drawingCtx!.clearRect(0, 0, this.canvasHeight, this.canvasWidth);
+    this.drawingCtx!.clearRect(
+      0,
+      0,
+      this.gameBoard.boardHeight,
+      this.gameBoard.boardWidth
+    );
   }
 
   private drawTarget() {
     this.drawingCtx!.fillStyle = 'rgb(20,0,200)';
-    this.drawingCtx!.fillRect(this.state.targetX, this.state.targetY, 5, 5);
+    this.drawingCtx!.fillRect(
+      this.gameBoard.targetX,
+      this.gameBoard.targetY,
+      5,
+      5
+    );
   }
 
   private updateSnakeCoords() {
-    this.checkSnakeBoundaries();
-    this.checkIfArrivedAtTarget();
+    this.gameBoard.checkSnakeBoundaries(this.snake);
+    this.gameBoard.checkIfArrivedAtTarget(this.snake);
 
-    if (this.state.targetX !== 0 || this.state.targetY !== 0) {
+    if (this.gameBoard.targetX !== 0 || this.gameBoard.targetY !== 0) {
       this.calculateTrajectory();
     }
 
@@ -110,8 +123,9 @@ export class Canvas extends React.Component<{}, ICanvasState> {
     let dX, dY;
     let distance;
 
-    dX = this.state.targetX - this.snake.x;
-    dY = this.state.targetY - this.snake.y;
+    dX = this.gameBoard.targetX - this.snake.x;
+    dY = this.gameBoard.targetY - this.snake.y;
+
     distance = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
 
     this.drawTrajectory();
@@ -125,40 +139,13 @@ export class Canvas extends React.Component<{}, ICanvasState> {
   private drawTrajectory() {
     this.drawingCtx!.beginPath();
     this.drawingCtx!.moveTo(this.snake.x, this.snake.y);
-    this.drawingCtx!.lineTo(this.state.targetX, this.state.targetY);
+    this.drawingCtx!.lineTo(this.gameBoard.targetX, this.gameBoard.targetY);
     this.drawingCtx!.stroke();
 
     this.drawingCtx!.beginPath();
     this.drawingCtx!.moveTo(this.snake.x, this.snake.y);
-    this.drawingCtx!.lineTo(this.snake.x, this.state.targetY);
-    this.drawingCtx!.lineTo(this.state.targetX, this.state.targetY);
+    this.drawingCtx!.lineTo(this.snake.x, this.gameBoard.targetY);
+    this.drawingCtx!.lineTo(this.gameBoard.targetX, this.gameBoard.targetY);
     this.drawingCtx!.stroke();
-  }
-
-  private checkIfArrivedAtTarget() {
-    if (
-      this.snake.x === this.state.targetX &&
-      this.snake.y === this.state.targetY
-    ) {
-      this.snake.setSpeed(0, 0);
-    }
-  }
-
-  private checkSnakeBoundaries() {
-    let xSpeed: number;
-    let ySpeed: number;
-
-    xSpeed = this.snake.getSpeed().xSpeed;
-    ySpeed = this.snake.getSpeed().ySpeed;
-
-    if (this.snake.x >= this.canvasWidth || this.snake.x <= 0) {
-      xSpeed = this.snake.getSpeed().xSpeed * -1;
-    }
-
-    if (this.snake.y >= this.canvasHeight || this.snake.y <= 0) {
-      ySpeed = this.snake.getSpeed().ySpeed * -1;
-    }
-
-    this.snake.setSpeed(xSpeed, ySpeed);
   }
 }

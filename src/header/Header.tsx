@@ -2,7 +2,7 @@ import './Header.css';
 
 import * as React from 'react';
 
-export class Header extends React.Component {
+export default class Header extends React.Component {
   private logo: string;
 
   constructor() {

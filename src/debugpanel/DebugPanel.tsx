@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-export class DebugPanel extends React.Component<IDebugPanelProps, {}> {
+export default class DebugPanel extends React.Component<IDebugPanelProps, {}> {
   constructor(props: IDebugPanelProps) {
     super(props);
   }

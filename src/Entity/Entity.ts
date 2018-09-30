@@ -1,4 +1,4 @@
-export abstract class Entity {
+export default abstract class Entity {
   protected _x: number;
   protected _y: number;
   protected _xSpeed: number;
@@ -10,8 +10,6 @@ export abstract class Entity {
     this._xSpeed = xSpeed;
     this._ySpeed = ySpeed;
   }
-
-  abstract move(): void;
 
   get x(): number {
     return this._x;

@@ -1,4 +1,4 @@
-import { Snake } from './Snake';
+import Snake from './Snake';
 
 describe('Snake', () => {
   let entity: Snake;
