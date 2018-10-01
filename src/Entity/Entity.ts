@@ -27,9 +27,9 @@ export default abstract class Entity {
     this._y = y;
   }
 
-  public setSpeed(x: number, y: number) {
-    this._xSpeed = x;
-    this._ySpeed = y;
+  public setSpeed(xSpeed: number, ySpeed: number) {
+    this._xSpeed = xSpeed;
+    this._ySpeed = ySpeed;
   }
 
   public getSpeed() {

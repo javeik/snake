@@ -1,11 +1,11 @@
 import Entity from '../Entity';
 
-export default class Snake extends Entity {
+export class Snake extends Entity {
   constructor(
-    x: number = 350,
-    y: number = 370,
-    xSpeed: number = 1,
-    ySpeed: number = 1
+    x: number = 300,
+    y: number = 300,
+    xSpeed: number,
+    ySpeed: number
   ) {
     super(x, y, xSpeed, ySpeed);
   }
@@ -15,3 +15,5 @@ export default class Snake extends Entity {
     this.y += this._ySpeed;
   }
 }
+
+export default Snake;

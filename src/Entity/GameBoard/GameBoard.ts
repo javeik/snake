@@ -1,14 +1,20 @@
 import Snake from '../Snake/Snake';
 
-export default class GameBoard {
+export class GameBoard {
   protected _boardWidth: number;
   protected _boardHeight: number;
   protected _targetX: number;
   protected _targetY: number;
+  protected snakeInGame: Snake;
+  private baseSpeed: number;
 
-  constructor(boardWidth: number = 700, boardHeight: number = 700) {
+  constructor(boardWidth: number = 600, boardHeight: number = 600) {
+    this.snakeInGame = new Snake(300, 300, 1, 1);
+
     this._boardHeight = boardHeight;
     this._boardWidth = boardWidth;
+
+    this.baseSpeed = 1;
   }
 
   get boardWidth(): number {
@@ -27,32 +33,69 @@ export default class GameBoard {
     return this._targetY;
   }
 
+  get snake(): Snake {
+    return this.snakeInGame;
+  }
+
   public setTarget(targetX: number, targetY: number) {
     this._targetX = targetX;
     this._targetY = targetY;
   }
 
-  public checkSnakeBoundaries(snake: Snake) {
+  public updateSnakeCoords() {
+    this.checkSnakeBoundaries();
+    this.checkIfArrivedAtTarget();
+
+    if (!!this._targetX || !!this._targetY) {
+      this.calculateTrajectory();
+    }
+
+    this.snakeInGame.move();
+  }
+
+  private checkSnakeBoundaries() {
     let xSpeed: number;
     let ySpeed: number;
 
-    xSpeed = snake.getSpeed().xSpeed;
-    ySpeed = snake.getSpeed().ySpeed;
+    xSpeed = this.snakeInGame.getSpeed().xSpeed;
+    ySpeed = this.snakeInGame.getSpeed().ySpeed;
 
-    if (snake.x >= this._boardWidth || snake.x <= 0) {
-      xSpeed = snake.getSpeed().xSpeed * -1;
+    if (this.snakeInGame.x > this._boardWidth || this.snakeInGame.x < 0) {
+      xSpeed = xSpeed * -1;
     }
 
-    if (snake.y >= this.boardHeight || snake.y <= 0) {
-      ySpeed = snake.getSpeed().ySpeed * -1;
+    if (this.snakeInGame.y > this._boardHeight || this.snakeInGame.y < 0) {
+      ySpeed = ySpeed * -1;
     }
 
-    snake.setSpeed(xSpeed, ySpeed);
+    this.snakeInGame.setSpeed(xSpeed, ySpeed);
   }
 
-  public checkIfArrivedAtTarget(snake: Snake) {
-    if (snake.x === this._targetX && snake.y === this._targetY) {
-      snake.setSpeed(0, 0);
+  private calculateTrajectory() {
+    let dX, dY;
+    let distance;
+
+    dX = this._targetX - this.snakeInGame.x;
+    dY = this._targetY - this.snakeInGame.y;
+
+    distance = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
+
+    this.snakeInGame.setSpeed(
+      dX < 0 ? this.baseSpeed * -1 : this.baseSpeed,
+      dY < 0 ? this.baseSpeed * -1 : this.baseSpeed
+    );
+
+    return { distanceToTarget: distance };
+  }
+
+  private checkIfArrivedAtTarget() {
+    if (
+      this.snakeInGame.x === this._targetX &&
+      this.snakeInGame.y === this._targetY
+    ) {
+      this.snakeInGame.setSpeed(0, 0);
     }
   }
 }
+
+export default GameBoard;
