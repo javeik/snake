@@ -37,6 +37,22 @@ export class GameBoard {
     return this.snakeInGame;
   }
 
+  public setSnakeToLeft() {
+    this.snakeInGame.setSpeed(-1, 0);
+  }
+
+  public setSnakeToRight() {
+    this.snakeInGame.setSpeed(1, 0);
+  }
+
+  public setSnakeToUp() {
+    this.snakeInGame.setSpeed(0, -1);
+  }
+
+  public setSnakeToDown() {
+    this.snakeInGame.setSpeed(0, 1);
+  }
+
   public setTarget(targetX: number, targetY: number) {
     this._targetX = targetX;
     this._targetY = targetY;

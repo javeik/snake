@@ -35,6 +35,8 @@ export class Canvas extends React.Component<{}, ICanvasState> {
             width={this.gameBoard.boardWidth}
             height={this.gameBoard.boardHeight}
             onClick={event => this.handleClicking(event)}
+            onKeyDown={e => this.handleKeyPress(e)}
+            tabIndex={-1}
           />
         </div>
         <div>
@@ -57,9 +59,31 @@ export class Canvas extends React.Component<{}, ICanvasState> {
   public componentDidMount() {
     if (this.drawingCanvas !== null) {
       this.drawingCtx = this.drawingCanvas.getContext('2d');
+
+      this.drawingCanvas.focus();
     }
 
     requestAnimationFrame(() => this.mainGame());
+  }
+
+  public handleKeyPress(event: React.KeyboardEvent<HTMLCanvasElement>) {
+    switch (event.key) {
+      case 'ArrowUp':
+        this.gameBoard.setSnakeToUp();
+        break;
+      case 'ArrowDown':
+        this.gameBoard.setSnakeToDown();
+        break;
+      case 'ArrowLeft':
+        this.gameBoard.setSnakeToLeft();
+        break;
+      case 'ArrowRight':
+        this.gameBoard.setSnakeToRight();
+        break;
+
+      default:
+        break;
+    }
   }
 
   private mainGame() {
