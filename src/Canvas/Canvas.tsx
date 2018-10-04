@@ -26,6 +26,7 @@ export class Canvas extends React.Component<{}, ICanvasState> {
     return (
       <div>
         <Header />
+
         <div>
           <canvas
             ref={canvas => {
@@ -39,6 +40,7 @@ export class Canvas extends React.Component<{}, ICanvasState> {
             tabIndex={-1}
           />
         </div>
+
         <div>
           <DebugPanel
             x={this.gameBoard.snake.x}
@@ -69,16 +71,16 @@ export class Canvas extends React.Component<{}, ICanvasState> {
   public handleKeyPress(event: React.KeyboardEvent<HTMLCanvasElement>) {
     switch (event.key) {
       case 'ArrowUp':
-        this.gameBoard.setSnakeToUp();
+        this.gameBoard.snake.turnUp();
         break;
       case 'ArrowDown':
-        this.gameBoard.setSnakeToDown();
+        this.gameBoard.snake.turnDown();
         break;
       case 'ArrowLeft':
-        this.gameBoard.setSnakeToLeft();
+        this.gameBoard.snake.turnLeft();
         break;
       case 'ArrowRight':
-        this.gameBoard.setSnakeToRight();
+        this.gameBoard.snake.turnRight();
         break;
 
       default:
@@ -91,6 +93,7 @@ export class Canvas extends React.Component<{}, ICanvasState> {
     this.gameBoard.updateSnakeCoords();
     this.drawTrajectory();
     this.drawSnake();
+    this.drawApple();
     this.drawTarget();
 
     requestAnimationFrame(() => this.mainGame());
@@ -111,6 +114,18 @@ export class Canvas extends React.Component<{}, ICanvasState> {
       15,
       15
     );
+  }
+
+  private drawApple() {
+    if (this.gameBoard.apples.length !== 0) {
+      this.drawingCtx!.fillStyle = 'rgb(20,0,200)';
+      this.drawingCtx!.fillRect(
+        this.gameBoard.apples[0].x,
+        this.gameBoard.apples[0].y,
+        15,
+        15
+      );
+    }
   }
 
   private clearScreen() {

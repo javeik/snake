@@ -1,20 +1,29 @@
 import Snake from '../Snake/Snake';
+import Apple from '../Apple/Apple';
 
 export class GameBoard {
   protected _boardWidth: number;
   protected _boardHeight: number;
+
   protected _targetX: number;
   protected _targetY: number;
+
   protected snakeInGame: Snake;
+  private appleInGame: Array<Apple>;
+
   private baseSpeed: number;
+  private speedIncreaseIncrement: number;
 
   constructor(boardWidth: number = 600, boardHeight: number = 600) {
-    this.snakeInGame = new Snake(300, 300, 1, 1);
+    this.baseSpeed = 1;
+    this.speedIncreaseIncrement = 2;
+
+    this.snakeInGame = new Snake(300, 300, this.baseSpeed);
 
     this._boardHeight = boardHeight;
     this._boardWidth = boardWidth;
 
-    this.baseSpeed = 1;
+    this.appleInGame = [];
   }
 
   get boardWidth(): number {
@@ -37,20 +46,8 @@ export class GameBoard {
     return this.snakeInGame;
   }
 
-  public setSnakeToLeft() {
-    this.snakeInGame.setSpeed(-1, 0);
-  }
-
-  public setSnakeToRight() {
-    this.snakeInGame.setSpeed(1, 0);
-  }
-
-  public setSnakeToUp() {
-    this.snakeInGame.setSpeed(0, -1);
-  }
-
-  public setSnakeToDown() {
-    this.snakeInGame.setSpeed(0, 1);
+  get apples(): Array<Apple> {
+    return this.appleInGame;
   }
 
   public setTarget(targetX: number, targetY: number) {
@@ -60,6 +57,7 @@ export class GameBoard {
 
   public updateSnakeCoords() {
     this.checkSnakeBoundaries();
+    this.addAppleIntoBoard();
     this.checkIfArrivedAtTarget();
 
     if (!!this._targetX || !!this._targetY) {
@@ -67,6 +65,8 @@ export class GameBoard {
     }
 
     this.snakeInGame.move();
+
+    this.eatApple();
   }
 
   private checkSnakeBoundaries() {
@@ -87,6 +87,17 @@ export class GameBoard {
     this.snakeInGame.setSpeed(xSpeed, ySpeed);
   }
 
+  private eatApple() {
+    if (
+      this.snakeInGame.x === this.appleInGame[0].x &&
+      this.snakeInGame.y === this.appleInGame[0].y
+    ) {
+      this.appleInGame = [];
+
+      this.snakeInGame.increaseSpeed(this.speedIncreaseIncrement);
+    }
+  }
+
   private calculateTrajectory() {
     let dX, dY;
     let distance;
@@ -97,8 +108,8 @@ export class GameBoard {
     distance = Math.sqrt(Math.pow(dX, 2) + Math.pow(dY, 2));
 
     this.snakeInGame.setSpeed(
-      dX < 0 ? this.baseSpeed * -1 : this.baseSpeed,
-      dY < 0 ? this.baseSpeed * -1 : this.baseSpeed
+      dX < 0 ? this.snakeInGame.baseSpeed * -1 : this.snakeInGame.baseSpeed,
+      dY < 0 ? this.snakeInGame.baseSpeed * -1 : this.snakeInGame.baseSpeed
     );
 
     return { distanceToTarget: distance };
@@ -111,6 +122,10 @@ export class GameBoard {
     ) {
       this.snakeInGame.setSpeed(0, 0);
     }
+  }
+
+  private addAppleIntoBoard() {
+    this.appleInGame.push(new Apple(this._boardWidth, this._boardHeight));
   }
 }
 
