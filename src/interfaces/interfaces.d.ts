@@ -1,4 +1,7 @@
+import GameBoard from './../Entity/GameBoard/GameBoard';
+
 interface ICanvasState {
+  gameBoard: GameBoard;
   distanceToTarget: number;
 }
 

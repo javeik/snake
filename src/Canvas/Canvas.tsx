@@ -1,4 +1,7 @@
-///<reference path='../interfaces/interfaces.d.ts' />
+export interface CanvasState {
+  gameBoard: GameBoard;
+  distanceToTarget: number;
+}
 
 import './Canvas.css';
 
@@ -9,7 +12,7 @@ import GameBoard from '../Entity/GameBoard/GameBoard';
 
 import Header from '../Header/Header';
 
-export class Canvas extends React.Component<{}, ICanvasState> {
+export class Canvas extends React.Component<{}, CanvasState> {
   private drawingCanvas: HTMLCanvasElement | null;
   private drawingCtx: CanvasRenderingContext2D | null;
   private gameBoard: GameBoard;
@@ -19,7 +22,7 @@ export class Canvas extends React.Component<{}, ICanvasState> {
 
     this.gameBoard = new GameBoard();
 
-    this.state = { distanceToTarget: 0 };
+    this.state = { gameBoard: this.gameBoard, distanceToTarget: 0 };
   }
 
   public render() {
@@ -43,7 +46,7 @@ export class Canvas extends React.Component<{}, ICanvasState> {
 
         <div>
           <DebugPanel
-            x={this.gameBoard.snake.x}
+            x={this.gameBoard.snakeInGame.x}
             y={this.gameBoard.snake.y}
             rectLength={this.gameBoard.boardHeight}
             rectWidth={this.gameBoard.boardWidth}

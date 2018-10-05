@@ -1,9 +1,25 @@
-///<reference path='../interfaces/interfaces.d.ts' />
+export interface CanvasState {
+  gameBoard: GameBoard;
+  distanceToTarget: number;
+}
+
+interface DebugPanelProps {
+  x: number;
+  y: number;
+  rectWidth: number;
+  rectLength: number;
+  speedX: number;
+  speedY: number;
+  clickX: number;
+  clickY: number;
+  distanceToClick: number;
+}
 
 import * as React from 'react';
+import GameBoard from '../Entity/GameBoard/GameBoard';
 
-export default class DebugPanel extends React.Component<IDebugPanelProps, {}> {
-  constructor(props: IDebugPanelProps) {
+export default class DebugPanel extends React.Component<DebugPanelProps, {}> {
+  constructor(props: DebugPanelProps) {
     super(props);
   }
 

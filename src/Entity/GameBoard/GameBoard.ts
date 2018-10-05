@@ -1,3 +1,5 @@
+import inRange from 'lodash/inRange';
+
 import Snake from '../Snake/Snake';
 import Apple from '../Apple/Apple';
 
@@ -8,7 +10,7 @@ export class GameBoard {
   protected _targetX: number;
   protected _targetY: number;
 
-  protected snakeInGame: Snake;
+  public snakeInGame: Snake;
   private appleInGame: Array<Apple>;
 
   private baseSpeed: number;
@@ -16,7 +18,7 @@ export class GameBoard {
 
   constructor(boardWidth: number = 600, boardHeight: number = 600) {
     this.baseSpeed = 1;
-    this.speedIncreaseIncrement = 2;
+    this.speedIncreaseIncrement = 1;
 
     this.snakeInGame = new Snake(300, 300, this.baseSpeed);
 
@@ -89,9 +91,33 @@ export class GameBoard {
 
   private eatApple() {
     if (
-      this.snakeInGame.x === this.appleInGame[0].x &&
-      this.snakeInGame.y === this.appleInGame[0].y
+      (inRange(
+        this.snakeInGame.x,
+        this.appleInGame[0].x,
+        this.appleInGame[0].x + 16
+      ) ||
+        inRange(
+          this.snakeInGame.x,
+          this.appleInGame[0].x,
+          this.appleInGame[0].x - 16
+        )) &&
+      (inRange(
+        this.snakeInGame.y,
+        this.appleInGame[0].y,
+        this.appleInGame[0].y + 16
+      ) ||
+        inRange(
+          this.snakeInGame.y,
+          this.appleInGame[0].y,
+          this.appleInGame[0].y - 16
+        ))
     ) {
+      console.log('snake x', this.snakeInGame.x);
+      console.log('snake y', this.snakeInGame.y);
+      console.log('apple x', this.appleInGame[0].x);
+      console.log('apple y', this.appleInGame[0].y);
+      console.log('__________________________');
+
       this.appleInGame = [];
 
       this.snakeInGame.increaseSpeed(this.speedIncreaseIncrement);
