@@ -1,14 +1,14 @@
 import inRange from 'lodash/inRange';
 
-import Snake from '../Snake/Snake';
 import Apple from '../Apple/Apple';
+import Snake from '../Snake/Snake';
 
 export class GameBoard {
   protected _boardWidth: number;
   protected _boardHeight: number;
 
-  protected _targetX: number;
-  protected _targetY: number;
+  protected _targetX: number = 0;
+  protected _targetY: number = 0;
 
   public snakeInGame: Snake;
   private appleInGame: Array<Apple>;
@@ -112,12 +112,6 @@ export class GameBoard {
           this.appleInGame[0].y - 16
         ))
     ) {
-      console.log('snake x', this.snakeInGame.x);
-      console.log('snake y', this.snakeInGame.y);
-      console.log('apple x', this.appleInGame[0].x);
-      console.log('apple y', this.appleInGame[0].y);
-      console.log('__________________________');
-
       this.appleInGame = [];
 
       this.snakeInGame.increaseSpeed(this.speedIncreaseIncrement);

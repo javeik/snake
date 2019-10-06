@@ -1,167 +1,137 @@
-export interface CanvasState {
-  gameBoard: GameBoard;
-  distanceToTarget: number;
-}
-
 import './Canvas.css';
 
-import * as React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
-import DebugPanel from '../DebugPanel/DebugPanel';
 import GameBoard from '../Entity/GameBoard/GameBoard';
+import useEventListener from './useEventListener';
 
-import Header from '../Header/Header';
+const Canvas: React.FC = () => {
+  const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
 
-export class Canvas extends React.Component<{}, CanvasState> {
-  private drawingCanvas: HTMLCanvasElement | null;
-  private drawingCtx: CanvasRenderingContext2D | null;
-  private gameBoard: GameBoard;
+  let gameBoard: GameBoard = new GameBoard();
 
-  constructor() {
-    super();
+  useEffect(() => {
+    requestAnimationFrame(() => mainGame());
+  });
 
-    this.gameBoard = new GameBoard();
-
-    this.state = { gameBoard: this.gameBoard, distanceToTarget: 0 };
-  }
-
-  public render() {
-    return (
-      <div>
-        <Header />
-
-        <div>
-          <canvas
-            ref={canvas => {
-              this.drawingCanvas = canvas;
-            }}
-            className="drawingCanvas-canvas"
-            width={this.gameBoard.boardWidth}
-            height={this.gameBoard.boardHeight}
-            onClick={event => this.handleClicking(event)}
-            onKeyDown={e => this.handleKeyPress(e)}
-            tabIndex={-1}
-          />
-        </div>
-
-        <div>
-          <DebugPanel
-            x={this.gameBoard.snakeInGame.x}
-            y={this.gameBoard.snake.y}
-            rectLength={this.gameBoard.boardHeight}
-            rectWidth={this.gameBoard.boardWidth}
-            speedX={this.gameBoard.snake.getSpeed().xSpeed}
-            speedY={this.gameBoard.snake.getSpeed().ySpeed}
-            clickX={this.gameBoard.targetX}
-            clickY={this.gameBoard.targetY}
-            distanceToClick={this.state.distanceToTarget}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  public componentDidMount() {
-    if (this.drawingCanvas !== null) {
-      this.drawingCtx = this.drawingCanvas.getContext('2d');
-
-      this.drawingCanvas.focus();
+  const getCanvasContext = () => {
+    if (!drawingCanvasRef.current) {
+      return null;
     }
 
-    requestAnimationFrame(() => this.mainGame());
-  }
+    const canvas: HTMLCanvasElement = drawingCanvasRef.current;
 
-  public handleKeyPress(event: React.KeyboardEvent<HTMLCanvasElement>) {
-    switch (event.key) {
-      case 'ArrowUp':
-        this.gameBoard.snake.turnUp();
-        break;
-      case 'ArrowDown':
-        this.gameBoard.snake.turnDown();
-        break;
-      case 'ArrowLeft':
-        this.gameBoard.snake.turnLeft();
-        break;
-      case 'ArrowRight':
-        this.gameBoard.snake.turnRight();
-        break;
+    canvas.focus();
 
-      default:
-        break;
+    return canvas.getContext('2d');
+  };
+
+  const handler = useCallback(
+    ({ key }) => {
+      switch (key) {
+        case 'ArrowUp':
+          gameBoard.snake.turnUp();
+          break;
+        case 'ArrowDown':
+          gameBoard.snake.turnDown();
+          break;
+        case 'ArrowLeft':
+          gameBoard.snake.turnLeft();
+          break;
+        case 'ArrowRight':
+          gameBoard.snake.turnRight();
+          break;
+
+        default:
+          break;
+      }
+    },
+    [gameBoard.snake]
+  );
+
+  useEventListener('keydown', handler);
+
+  const mainGame = () => {
+    clearScreen();
+    gameBoard.updateSnakeCoords();
+    drawTrajectory();
+    drawSnake();
+    drawApple();
+    drawTarget();
+
+    requestAnimationFrame(() => mainGame());
+  };
+
+  const handleClicking = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    gameBoard.setTarget(
+      event.clientX - drawingCanvasRef.current.getBoundingClientRect().left,
+      event.clientY - drawingCanvasRef.current.getBoundingClientRect().top
+    );
+  };
+
+  const drawSnake = () => {
+    const context = getCanvasContext();
+
+    if (context) {
+      context.fillStyle = 'rgb(20,0,200)';
+      context.fillRect(gameBoard.snake.x, gameBoard.snake.y, 10, 10);
     }
-  }
+  };
 
-  private mainGame() {
-    this.clearScreen();
-    this.gameBoard.updateSnakeCoords();
-    this.drawTrajectory();
-    this.drawSnake();
-    this.drawApple();
-    this.drawTarget();
+  const drawApple = () => {
+    const context = getCanvasContext();
 
-    requestAnimationFrame(() => this.mainGame());
-  }
-
-  private handleClicking(event: React.MouseEvent<HTMLCanvasElement>) {
-    this.gameBoard.setTarget(
-      event.clientX - this.drawingCanvas!.getBoundingClientRect().left,
-      event.clientY - this.drawingCanvas!.getBoundingClientRect().top
-    );
-  }
-
-  private drawSnake() {
-    this.drawingCtx!.fillStyle = 'rgb(20,0,200)';
-    this.drawingCtx!.fillRect(
-      this.gameBoard.snake.x,
-      this.gameBoard.snake.y,
-      15,
-      15
-    );
-  }
-
-  private drawApple() {
-    if (this.gameBoard.apples.length !== 0) {
-      this.drawingCtx!.fillStyle = 'rgb(20,0,200)';
-      this.drawingCtx!.fillRect(
-        this.gameBoard.apples[0].x,
-        this.gameBoard.apples[0].y,
-        15,
-        15
-      );
+    if (context) {
+      if (gameBoard.apples.length !== 0) {
+        context.fillStyle = 'rgb(20,0,200)';
+        context.fillRect(gameBoard.apples[0].x, gameBoard.apples[0].y, 10, 10);
+      }
     }
-  }
+  };
 
-  private clearScreen() {
-    this.drawingCtx!.clearRect(
-      0,
-      0,
-      this.gameBoard.boardHeight,
-      this.gameBoard.boardWidth
-    );
-  }
+  const clearScreen = () => {
+    const context = getCanvasContext();
 
-  private drawTarget() {
-    this.drawingCtx!.fillStyle = 'rgb(20,0,200)';
-    this.drawingCtx!.fillRect(
-      this.gameBoard.targetX,
-      this.gameBoard.targetY,
-      15,
-      15
-    );
-  }
+    if (context) {
+      context.clearRect(0, 0, gameBoard.boardHeight, gameBoard.boardWidth);
+    }
+  };
 
-  private drawTrajectory() {
-    this.drawingCtx!.beginPath();
-    this.drawingCtx!.moveTo(this.gameBoard.snake.x, this.gameBoard.snake.y);
-    this.drawingCtx!.lineTo(this.gameBoard.targetX, this.gameBoard.targetY);
-    this.drawingCtx!.stroke();
+  const drawTarget = () => {
+    const context = getCanvasContext();
 
-    this.drawingCtx!.beginPath();
-    this.drawingCtx!.moveTo(this.gameBoard.snake.x, this.gameBoard.snake.y);
-    this.drawingCtx!.lineTo(this.gameBoard.snake.x, this.gameBoard.targetY);
-    this.drawingCtx!.lineTo(this.gameBoard.targetX, this.gameBoard.targetY);
-    this.drawingCtx!.stroke();
-  }
-}
+    if (context) {
+      context.fillStyle = 'rgb(20,0,200)';
+      context.fillRect(gameBoard.targetX, gameBoard.targetY, 15, 15);
+    }
+  };
+
+  const drawTrajectory = () => {
+    const context = getCanvasContext();
+
+    if (context) {
+      context.beginPath();
+      context.moveTo(gameBoard.snake.x, gameBoard.snake.y);
+      context.lineTo(gameBoard.targetX, gameBoard.targetY);
+      context.stroke();
+
+      context.beginPath();
+      context.moveTo(gameBoard.snake.x, gameBoard.snake.y);
+      context.lineTo(gameBoard.snake.x, gameBoard.targetY);
+      context.lineTo(gameBoard.targetX, gameBoard.targetY);
+      context.stroke();
+    }
+  };
+
+  return (
+    <canvas
+      ref={drawingCanvasRef}
+      className="drawingCanvas-canvas"
+      width={gameBoard.boardWidth}
+      height={gameBoard.boardHeight}
+      onClick={event => handleClicking(event)}
+    />
+  );
+};
 
 export default Canvas;

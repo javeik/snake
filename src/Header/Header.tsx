@@ -1,24 +1,13 @@
 import './Header.css';
 
-import * as React from 'react';
+import React from 'react';
 
-export default class Header extends React.Component {
-  private logo: string;
+const Header: React.FC = () => {
+  return (
+    <div className="header">
+      <h1>Welcome to Snake</h1>
+    </div>
+  );
+};
 
-  constructor() {
-    super();
-
-    this.logo = require('./img/logo.svg');
-  }
-
-  render() {
-    return (
-      <div className="header">
-        <div className="header-header">
-          <img src={this.logo} className="header-logo" alt="logo" />
-          <h2>Welcome to Snake</h2>
-        </div>
-      </div>
-    );
-  }
-}
+export default Header;
