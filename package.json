@@ -2,17 +2,24 @@
   "name": "snake",
   "version": "0.1.0",
   "private": true,
+  "devDependencies": {
+    "@types/enzyme": "^3.10.5",
+    "@types/enzyme-adapter-react-16": "^1.0.6",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.2",
+    "prettier": "^2.0.2"
+  },
   "dependencies": {
-    "@types/jest": "24.0.18",
-    "@types/lodash": "^4.14.141",
-    "@types/node": "12.7.11",
-    "@types/react": "16.9.5",
-    "@types/react-dom": "16.9.1",
+    "@types/jest": "25.1.5",
+    "@types/lodash": "^4.14.149",
+    "@types/node": "13.11.0",
+    "@types/react": "16.9.32",
+    "@types/react-dom": "16.9.6",
     "lodash": "^4.17.15",
-    "react": "^16.10.2",
-    "react-dom": "^16.10.2",
-    "react-scripts": "3.2.0",
-    "typescript": "3.6.3"
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1",
+    "react-scripts": "3.4.1",
+    "typescript": "3.8.3"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -34,12 +41,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "@types/enzyme": "^3.10.3",
-    "@types/enzyme-adapter-react-16": "^1.0.5",
-    "enzyme": "^3.10.0",
-    "enzyme-adapter-react-16": "^1.14.0",
-    "prettier": "^1.18.2"
   }
 }
