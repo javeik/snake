@@ -5,6 +5,7 @@ import React, { useCallback, useRef, useState, useLayoutEffect } from 'react';
 import useEventListener from '../hooks/useEventListener/useEventListener';
 import useSnake from '../hooks/useSnake/useSnake';
 import useApple from '../hooks/useApple/useApple';
+import StartGame from '../StartGame/StartGame';
 
 const boardWidth: number = 600;
 const boardHeight: number = 600;
@@ -51,6 +52,7 @@ const Canvas: React.FC = () => {
   const mainGame = () => {
     clearScreen();
 
+    checBoundaries();
     snake.move();
 
     drawSnake();
@@ -59,12 +61,13 @@ const Canvas: React.FC = () => {
     requestRef.current = requestAnimationFrame(mainGame);
   };
 
+  const checBoundaries = () => {};
+
   const drawSnake = () => {
     const context = getCanvasContext();
 
     if (context) {
       context.fillStyle = 'rgb(20,0,200)';
-
       context.fillRect(snake.x, snake.y, 10, 10);
     }
   };
@@ -95,20 +98,24 @@ const Canvas: React.FC = () => {
   });
 
   return (
-    <>
-      <canvas
-        ref={drawingCanvasRef}
-        className="drawingCanvas-canvas"
-        width={boardWidth}
-        height={boardHeight}
-      />
+    <div className="canvas-container">
+      {!gameIsRunning ? (
+        <StartGame />
+      ) : (
+        <canvas
+          className="canvas-area"
+          ref={drawingCanvasRef}
+          width={boardWidth}
+          height={boardHeight}
+        />
+      )}
 
-      <ul>
+      <ul style={{ position: 'absolute', bottom: '0' }}>
         <li>Animation Id:{requestRef.current}</li>
         <li>{`Snake position: x: ${snake.x}, y: ${snake.y}`}</li>
         <li>{`Snake speed: x: ${snake.xSpeed}, y: ${snake.ySpeed}`}</li>
       </ul>
-    </>
+    </div>
   );
 };
 

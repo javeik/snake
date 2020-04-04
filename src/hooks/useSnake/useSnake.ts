@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 export default () => {
-  const [speed, setSpeed] = useState(1);
+  const [speed, setSpeed] = useState(1.5);
   const [xSpeed, setXSpeed] = useState(0);
   const [ySpeed, setYSpeed] = useState(1);
 

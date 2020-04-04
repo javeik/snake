@@ -1,19 +1,16 @@
-.drawingCanvas {
-  text-align: center;
+.canvas-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding-top: 48px;
 }
 
-.drawingCanvas-header {
-  background-color: #222;
-  height: 150px;
-}
+.canvas-area {
+  align-self: center;
 
-.drawingCanvas-intro {
-  font-size: large;
-}
+  width: 600px;
 
-.drawingCanvas-canvas {
   background-color: lightgreen;
-  border: 2px solid black;
-  position: fixed;
-  left: 32%;
+  border: 1px solid grey;
 }
