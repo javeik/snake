@@ -1,18 +1,21 @@
 import './Canvas.css';
 
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useRef, useState, useLayoutEffect } from 'react';
 
-import GameBoard from '../Entity/GameBoard/GameBoard';
-import useEventListener from './useEventListener';
+import useEventListener from '../hooks/useEventListener/useEventListener';
+import useSnake from '../hooks/useSnake/useSnake';
+import useApple from '../hooks/useApple/useApple';
+
+const boardWidth: number = 600;
+const boardHeight: number = 600;
 
 const Canvas: React.FC = () => {
+  const [gameIsRunning, setGameIsRunning] = useState(false);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
+  const requestRef = React.useRef<number>();
 
-  let gameBoard: GameBoard = new GameBoard();
-
-  useEffect(() => {
-    requestAnimationFrame(() => mainGame());
-  });
+  const snake = useSnake();
+  const apple = useApple();
 
   const getCanvasContext = () => {
     if (!drawingCanvasRef.current) {
@@ -21,52 +24,39 @@ const Canvas: React.FC = () => {
 
     const canvas: HTMLCanvasElement = drawingCanvasRef.current;
 
-    canvas.focus();
-
     return canvas.getContext('2d');
   };
 
-  const handler = useCallback(
-    ({ key }) => {
-      switch (key) {
-        case 'ArrowUp':
-          gameBoard.snake.turnUp();
-          break;
-        case 'ArrowDown':
-          gameBoard.snake.turnDown();
-          break;
-        case 'ArrowLeft':
-          gameBoard.snake.turnLeft();
-          break;
-        case 'ArrowRight':
-          gameBoard.snake.turnRight();
-          break;
-
-        default:
-          break;
-      }
-    },
-    [gameBoard.snake]
-  );
+  const handler = useCallback(({ code }) => {
+    switch (code) {
+      case 'ArrowUp':
+        snake.turnUp();
+        break;
+      case 'ArrowDown':
+        snake.turnDown();
+        break;
+      case 'ArrowLeft':
+        snake.turnLeft();
+        break;
+      case 'ArrowRight':
+        snake.turnRight();
+        break;
+      case 'Space':
+        setGameIsRunning(!gameIsRunning);
+    }
+  }, []);
 
   useEventListener('keydown', handler);
 
   const mainGame = () => {
     clearScreen();
-    gameBoard.updateSnakeCoords();
-    drawTrajectory();
+
+    snake.move();
+
     drawSnake();
     drawApple();
-    drawTarget();
 
-    requestAnimationFrame(() => mainGame());
-  };
-
-  const handleClicking = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    gameBoard.setTarget(
-      event.clientX - drawingCanvasRef.current.getBoundingClientRect().left,
-      event.clientY - drawingCanvasRef.current.getBoundingClientRect().top
-    );
+    requestRef.current = requestAnimationFrame(mainGame);
   };
 
   const drawSnake = () => {
@@ -74,7 +64,8 @@ const Canvas: React.FC = () => {
 
     if (context) {
       context.fillStyle = 'rgb(20,0,200)';
-      context.fillRect(gameBoard.snake.x, gameBoard.snake.y, 10, 10);
+
+      context.fillRect(snake.x, snake.y, 10, 10);
     }
   };
 
@@ -82,10 +73,8 @@ const Canvas: React.FC = () => {
     const context = getCanvasContext();
 
     if (context) {
-      if (gameBoard.apples.length !== 0) {
-        context.fillStyle = 'rgb(20,0,200)';
-        context.fillRect(gameBoard.apples[0].x, gameBoard.apples[0].y, 10, 10);
-      }
+      context.fillStyle = 'rgb(0,0,0)';
+      context.fillRect(apple.x, apple.y, 10, 10);
     }
   };
 
@@ -93,44 +82,33 @@ const Canvas: React.FC = () => {
     const context = getCanvasContext();
 
     if (context) {
-      context.clearRect(0, 0, gameBoard.boardHeight, gameBoard.boardWidth);
+      context.clearRect(0, 0, boardHeight, boardWidth);
     }
   };
 
-  const drawTarget = () => {
-    const context = getCanvasContext();
-
-    if (context) {
-      context.fillStyle = 'rgb(20,0,200)';
-      context.fillRect(gameBoard.targetX, gameBoard.targetY, 15, 15);
+  useLayoutEffect(() => {
+    if (gameIsRunning) {
+      requestRef.current = requestAnimationFrame(mainGame);
     }
-  };
 
-  const drawTrajectory = () => {
-    const context = getCanvasContext();
-
-    if (context) {
-      context.beginPath();
-      context.moveTo(gameBoard.snake.x, gameBoard.snake.y);
-      context.lineTo(gameBoard.targetX, gameBoard.targetY);
-      context.stroke();
-
-      context.beginPath();
-      context.moveTo(gameBoard.snake.x, gameBoard.snake.y);
-      context.lineTo(gameBoard.snake.x, gameBoard.targetY);
-      context.lineTo(gameBoard.targetX, gameBoard.targetY);
-      context.stroke();
-    }
-  };
+    return () => cancelAnimationFrame(requestRef.current);
+  });
 
   return (
-    <canvas
-      ref={drawingCanvasRef}
-      className="drawingCanvas-canvas"
-      width={gameBoard.boardWidth}
-      height={gameBoard.boardHeight}
-      onClick={event => handleClicking(event)}
-    />
+    <>
+      <canvas
+        ref={drawingCanvasRef}
+        className="drawingCanvas-canvas"
+        width={boardWidth}
+        height={boardHeight}
+      />
+
+      <ul>
+        <li>Animation Id:{requestRef.current}</li>
+        <li>{`Snake position: x: ${snake.x}, y: ${snake.y}`}</li>
+        <li>{`Snake speed: x: ${snake.xSpeed}, y: ${snake.ySpeed}`}</li>
+      </ul>
+    </>
   );
 };
 

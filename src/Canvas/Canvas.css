@@ -13,8 +13,7 @@
 
 .drawingCanvas-canvas {
   background-color: lightgreen;
-  border: 5px solid black;
-  border-radius: 5px;
+  border: 2px solid black;
   position: fixed;
   left: 32%;
 }
