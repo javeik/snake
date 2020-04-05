@@ -1,0 +1,11 @@
+.game-over-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  height: 600px;
+}
+
+.game-over-text {
+  text-align: center;
+}

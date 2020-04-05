@@ -1,22 +1,24 @@
 import './Canvas.css';
 
-import React, { useCallback, useRef, useState, useLayoutEffect } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 
-import useEventListener from '../hooks/useEventListener/useEventListener';
-import useSnake from '../hooks/useSnake/useSnake';
-import useApple from '../hooks/useApple/useApple';
 import StartGame from '../StartGame/StartGame';
-
-const boardWidth: number = 600;
-const boardHeight: number = 600;
+import useGameState from '../hooks/useGameState/useGameState';
+import GameOver from '../GameOver/GameOver';
 
 const Canvas: React.FC = () => {
-  const [gameIsRunning, setGameIsRunning] = useState(false);
   const drawingCanvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = React.useRef<number>();
 
-  const snake = useSnake();
-  const apple = useApple();
+  const {
+    boardWidth,
+    boardHeight,
+    snake,
+    apple,
+    numberOfApplesEaten,
+    updateGameState,
+    gameState,
+  } = useGameState();
 
   const getCanvasContext = () => {
     if (!drawingCanvasRef.current) {
@@ -28,32 +30,10 @@ const Canvas: React.FC = () => {
     return canvas.getContext('2d');
   };
 
-  const handler = useCallback(({ code }) => {
-    switch (code) {
-      case 'ArrowUp':
-        snake.turnUp();
-        break;
-      case 'ArrowDown':
-        snake.turnDown();
-        break;
-      case 'ArrowLeft':
-        snake.turnLeft();
-        break;
-      case 'ArrowRight':
-        snake.turnRight();
-        break;
-      case 'Space':
-        setGameIsRunning(!gameIsRunning);
-    }
-  }, []);
-
-  useEventListener('keydown', handler);
-
   const mainGame = () => {
     clearScreen();
 
-    checBoundaries();
-    snake.move();
+    updateGameState();
 
     drawSnake();
     drawApple();
@@ -61,14 +41,15 @@ const Canvas: React.FC = () => {
     requestRef.current = requestAnimationFrame(mainGame);
   };
 
-  const checBoundaries = () => {};
-
   const drawSnake = () => {
     const context = getCanvasContext();
 
     if (context) {
       context.fillStyle = 'rgb(20,0,200)';
-      context.fillRect(snake.x, snake.y, 10, 10);
+
+      context.beginPath();
+      context.arc(snake.x, snake.y, 10, 0, 2 * Math.PI);
+      context.fill();
     }
   };
 
@@ -76,8 +57,11 @@ const Canvas: React.FC = () => {
     const context = getCanvasContext();
 
     if (context) {
-      context.fillStyle = 'rgb(0,0,0)';
-      context.fillRect(apple.x, apple.y, 10, 10);
+      context.fillStyle = 'rgb(255,0,0)';
+
+      context.beginPath();
+      context.arc(apple.x, apple.y, 10, 0, 2 * Math.PI);
+      context.fill();
     }
   };
 
@@ -90,7 +74,7 @@ const Canvas: React.FC = () => {
   };
 
   useLayoutEffect(() => {
-    if (gameIsRunning) {
+    if (gameState === 'running') {
       requestRef.current = requestAnimationFrame(mainGame);
     }
 
@@ -99,9 +83,15 @@ const Canvas: React.FC = () => {
 
   return (
     <div className="canvas-container">
-      {!gameIsRunning ? (
-        <StartGame />
-      ) : (
+      {gameState === 'not running' && (
+        <StartGame headerClassName={'start-header-spinning'} />
+      )}
+
+      {gameState === 'starting' && (
+        <StartGame headerClassName={'start-header-scale'} />
+      )}
+
+      {gameState === 'running' && (
         <canvas
           className="canvas-area"
           ref={drawingCanvasRef}
@@ -110,10 +100,15 @@ const Canvas: React.FC = () => {
         />
       )}
 
+      {gameState === 'out of bounds' && <GameOver />}
+
       <ul style={{ position: 'absolute', bottom: '0' }}>
         <li>Animation Id:{requestRef.current}</li>
         <li>{`Snake position: x: ${snake.x}, y: ${snake.y}`}</li>
         <li>{`Snake speed: x: ${snake.xSpeed}, y: ${snake.ySpeed}`}</li>
+        <li>{`Snake speed: ${snake.speed}`}</li>
+        <li>{`Apple position: x: ${apple.x}, y: ${apple.y}`}</li>
+        <li>{`Number of Apples eaten: ${numberOfApplesEaten}`}</li>
       </ul>
     </div>
   );

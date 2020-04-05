@@ -6,6 +6,32 @@
   height: 600px;
 }
 
-.start-header {
+.start-header-spinning {
   text-align: center;
+
+  animation: spinning 1.5s ease-in-out 1 0.5s;
+}
+
+.start-header-scale {
+  text-align: center;
+
+  animation: scale 2s ease-in 1;
+}
+
+@keyframes spinning {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scale {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0);
+  }
 }

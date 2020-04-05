@@ -1,16 +1,33 @@
 import { useState } from 'react';
 
-export default () => {
-  const [speed, setSpeed] = useState(1.5);
-  const [xSpeed, setXSpeed] = useState(0);
-  const [ySpeed, setYSpeed] = useState(1);
+const baseSpeed = 1.5;
 
-  const [x, setX] = useState(300);
-  const [y, setY] = useState(300);
+const defaultX = 300;
+const defaultY = 300;
+
+export default () => {
+  const [speed, setSpeed] = useState(baseSpeed);
+  const [xSpeed, setXSpeed] = useState(0);
+  const [ySpeed, setYSpeed] = useState(baseSpeed);
+
+  const [x, setX] = useState(defaultX);
+  const [y, setY] = useState(defaultY);
+
+  const increaseSpeed = () => {
+    setSpeed(speed + 1.5);
+
+    if (xSpeed) {
+      setXSpeed((xSpeed / Math.abs(xSpeed)) * speed);
+    }
+
+    if (ySpeed) {
+      setXSpeed((ySpeed / Math.abs(ySpeed)) * speed);
+    }
+  };
 
   const move = () => {
-    setX((prevX) => prevX + xSpeed);
-    setY((prevY) => prevY + ySpeed);
+    setX(x + xSpeed);
+    setY(y + ySpeed);
   };
 
   const turnLeft = () => {
@@ -35,14 +52,11 @@ export default () => {
 
   return {
     speed,
+    increaseSpeed,
     x,
     y,
-    setX,
-    setY,
     xSpeed,
     ySpeed,
-    setXSpeed,
-    setYSpeed,
     move,
     turnLeft,
     turnRight,
