@@ -34,7 +34,7 @@ export default () => {
     if (checkCollision()) {
       setNumberOfApplesEaten(numberOfApplesEaten + 1);
 
-      snake.increaseSpeed();
+      snake.eatApple();
 
       apple.placeNewApple();
     }

@@ -47,9 +47,11 @@ const Canvas: React.FC = () => {
     if (context) {
       context.fillStyle = 'rgb(20,0,200)';
 
-      context.beginPath();
-      context.arc(snake.x, snake.y, 10, 0, 2 * Math.PI);
-      context.fill();
+      snake.bodyCoords.forEach(({ x, y }) => {
+        context.beginPath();
+        context.arc(x, y, 10, 0, 2 * Math.PI);
+        context.fill();
+      });
     }
   };
 
@@ -107,6 +109,7 @@ const Canvas: React.FC = () => {
         <li>{`Snake position: x: ${snake.x}, y: ${snake.y}`}</li>
         <li>{`Snake speed: x: ${snake.xSpeed}, y: ${snake.ySpeed}`}</li>
         <li>{`Snake speed: ${snake.speed}`}</li>
+        <li>{`Snake body: ${JSON.stringify(snake.bodyCoords)}`}</li>
         <li>{`Apple position: x: ${apple.x}, y: ${apple.y}`}</li>
         <li>{`Number of Apples eaten: ${numberOfApplesEaten}`}</li>
       </ul>
