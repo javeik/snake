@@ -14,14 +14,14 @@ export default () => {
   const [y, setY] = useState(defaultY);
 
   const increaseSpeed = () => {
-    setSpeed(speed + 1.5);
+    setSpeed(speed + 0.5);
 
     if (xSpeed) {
       setXSpeed((xSpeed / Math.abs(xSpeed)) * speed);
     }
 
     if (ySpeed) {
-      setXSpeed((ySpeed / Math.abs(ySpeed)) * speed);
+      setYSpeed((ySpeed / Math.abs(ySpeed)) * speed);
     }
   };
 
